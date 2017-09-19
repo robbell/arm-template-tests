@@ -1,0 +1,51 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "enableEncryption" : {
+            "type" : "string",
+            "allowedValues": [
+                "true",
+                "false"
+            ],
+            "defaultValue": "false",
+            "metadata": {
+                "description": "Enable encryption for the storage account?"
+            }
+        }
+    },
+    "resources": [
+        {
+            "name": "simplestorageenc",
+            "type": "Microsoft.Storage/storageAccounts",
+            "apiVersion": "2016-01-01",
+            "condition": "[equals(parameters('enableEncryption'), 'true')]",
+            "sku": {
+                "name": "Standard_LRS"
+            },
+            "kind": "Storage",
+            "location": "[resourceGroup().location]",
+            "properties": {
+                "encryption": {
+                    "services": {
+                        "blob": {
+                            "enabled": true
+                        }
+                    },
+                    "keySource": "Microsoft.Storage"
+                }
+            }
+        },
+        {
+            "name": "simplestoragenon",
+            "type": "Microsoft.Storage/storageAccounts",
+            "apiVersion": "2016-01-01",
+            "condition": "[equals(parameters('enableEncryption'), 'false')]",
+            "sku": {
+                "name": "Standard_LRS"
+            },
+            "kind": "Storage",
+            "location": "[resourceGroup().location]"
+        }
+    ]
+}
